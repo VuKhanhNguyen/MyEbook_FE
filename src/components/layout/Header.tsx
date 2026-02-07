@@ -5,8 +5,10 @@ import { BookOpen, User, Menu } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
 
 export const Header = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -15,6 +17,10 @@ export const Header = () => {
     { name: "Library", href: "/reader" },
     { name: "About", href: "/about" },
   ];
+
+  const handleLogin = () => {
+    window.location.href = "/login";
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
@@ -49,10 +55,26 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium text-white">
-            <User className="h-4 w-4" />
-            <span>Sign In</span>
-          </button>
+          {isAuthenticated ? (
+            <div className="hidden md:flex items-center gap-4">
+              <span className="text-sm font-medium text-white/90">
+                Hello {user?.email}
+              </span>
+              <button
+                onClick={logout}
+                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium text-white"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link href="/login">
+              <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium text-white">
+                <User className="h-4 w-4" />
+                <span>Sign In</span>
+              </button>
+            </Link>
+          )}
 
           {/* Mobile Menu Toggle */}
           <button

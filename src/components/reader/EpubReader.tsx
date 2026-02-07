@@ -136,6 +136,9 @@ export const EpubReader = ({ url }: EpubReaderProps) => {
                   ...ReactReaderStyle.tocArea,
                   display: "none",
                 },
+                tocButton: {
+                  display: "none",
+                },
                 arrow: {
                   ...ReactReaderStyle.arrow,
                   color: "#555", // Darker arrows for paper contrast
