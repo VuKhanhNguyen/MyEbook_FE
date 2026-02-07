@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export default function RegisterPage() {
   const { register: authRegister } = useAuth();
   const [formData, setFormData] = useState({
+    username: "",
     fullName: "",
     email: "",
     password: "",
@@ -24,6 +25,19 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
 
   const validateForm = () => {
+    // 0. Username Validation (Alphanumeric, max 16 chars)
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(formData.username)) {
+      setError(
+        "Username must contain only letters and numbers (no special characters).",
+      );
+      return false;
+    }
+    if (formData.username.length > 16) {
+      setError("Username cannot exceed 16 characters.");
+      return false;
+    }
+
     // 1. Full Name Validation (Letters and spaces only, including Vietnamese)
     const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
     if (!nameRegex.test(formData.fullName)) {
@@ -66,6 +80,7 @@ export default function RegisterPage() {
     try {
       // 1. Register User
       await api.post("/auth/register", {
+        username: formData.username,
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
@@ -73,7 +88,7 @@ export default function RegisterPage() {
 
       // 2. Auto Login after registration
       const { data } = await api.post("/auth/login", {
-        email: formData.email,
+        username: formData.username,
         password: formData.password,
       });
       await authRegister(data.access_token);
@@ -97,6 +112,19 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+              <Input
+                placeholder="Username"
+                value={formData.username}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
+                required
+                className="pl-10"
+              />
+            </div>
+
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
               <Input

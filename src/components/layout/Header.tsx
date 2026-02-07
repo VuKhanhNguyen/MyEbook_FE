@@ -58,7 +58,7 @@ export const Header = () => {
           {isAuthenticated ? (
             <div className="hidden md:flex items-center gap-4">
               <span className="text-sm font-medium text-white/90">
-                Hello {user?.email}
+                Hello {user?.username}
               </span>
               <button
                 onClick={logout}
