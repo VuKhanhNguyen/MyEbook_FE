@@ -13,6 +13,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (token: string) => Promise<void>;
@@ -25,15 +26,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const checkAuth = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
+    const storedToken = localStorage.getItem("access_token");
+    if (!storedToken) {
+      setToken(null);
       setIsLoading(false);
       return;
     }
+
+    setToken(storedToken);
 
     try {
       const { data } = await api.get("/auth/profile");
@@ -41,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Auth check failed", error);
       localStorage.removeItem("access_token");
+      setToken(null);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -51,20 +57,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = async (token: string) => {
-    localStorage.setItem("access_token", token);
+  const login = async (newToken: string) => {
+    localStorage.setItem("access_token", newToken);
+    setToken(newToken);
     await checkAuth();
     router.push("/");
   };
 
-  const register = async (token: string) => {
-    localStorage.setItem("access_token", token);
+  const register = async (newToken: string) => {
+    localStorage.setItem("access_token", newToken);
+    setToken(newToken);
     await checkAuth();
     router.push("/");
   };
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    setToken(null);
     setUser(null);
     router.push("/login");
   };
@@ -73,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        token,
         isAuthenticated: !!user,
         isLoading,
         login,

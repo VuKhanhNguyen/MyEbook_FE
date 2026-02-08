@@ -1,13 +1,15 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "destructive" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg" | "icon";
   isLoading?: boolean;
 }
 
 export function Button({
   children,
   variant = "primary",
+  size = "default",
   isLoading,
   className = "",
   ...props
@@ -19,11 +21,26 @@ export function Button({
     primary: "bg-white text-black hover:bg-white/90 shadow-lg shadow-white/5",
     secondary:
       "bg-white/10 text-white border border-white/10 hover:bg-white/20 backdrop-blur-md",
+    destructive:
+      "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20",
+    outline:
+      "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+    ghost: "hover:bg-accent hover:text-accent-foreground",
   };
+
+  const sizes = {
+    default: "h-10 px-4 py-2",
+    sm: "h-9 rounded-md px-3",
+    lg: "h-11 rounded-md px-8",
+    icon: "h-10 w-10 p-2 flex items-center justify-center",
+  };
+
+  const selectedVariant = variants[variant] || variants.primary;
+  const selectedSize = sizes[size] || sizes.default;
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${className} relative overflow-hidden`}
+      className={`${baseStyles} ${selectedVariant} ${selectedSize} ${className} relative overflow-hidden`}
       disabled={isLoading || props.disabled}
       {...props}
     >
