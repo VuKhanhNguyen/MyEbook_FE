@@ -16,4 +16,9 @@ export interface Book {
   createdAt: string;
   updatedAt: string;
   coverUrl?: string; // Optional cover URL if we generate covers later
+  lastRead?: string; // Timestamp of last read
+  progress?: number; // % progress
 }
+
+export type ViewMode = "grid" | "list";
+export type SortOption = "recent" | "title" | "author";
