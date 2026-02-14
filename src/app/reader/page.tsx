@@ -25,7 +25,7 @@ function ReaderContent() {
 
   if (ext === "pdf") {
     return (
-      <main className="min-h-screen w-full h-screen bg-gray-900">
+      <main className="min-h-screen w-full h-screen bg-gray-900 relative">
         <iframe src={url} className="w-full h-full" title="PDF Reader" />
       </main>
     );
@@ -33,7 +33,7 @@ function ReaderContent() {
 
   if (ext === "epub") {
     return (
-      <main className="min-h-screen">
+      <main className="min-h-screen relative">
         <EpubReader url={url} />
       </main>
     );
@@ -41,25 +41,27 @@ function ReaderContent() {
 
   if (ext === "mobi" || ext === "prc") {
     return (
-      <main className="min-h-screen bg-gray-900 overflow-auto">
+      <main className="min-h-screen bg-gray-900 overflow-auto relative">
         <MobiReader url={url} />
       </main>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-white gap-4">
-      <p className="text-xl">
-        Format .{ext} is not supported for inline reading.
-      </p>
-      <a
-        href={url}
-        download
-        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-      >
-        Download File
-      </a>
-    </div>
+    <>
+      <div className="flex flex-col items-center justify-center min-h-screen text-white gap-4">
+        <p className="text-xl">
+          Format .{ext} is not supported for inline reading.
+        </p>
+        <a
+          href={url}
+          download
+          className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+        >
+          Download File
+        </a>
+      </div>
+    </>
   );
 }
 

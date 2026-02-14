@@ -125,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       {/* Session Expired Dialog */}
       {sessionExpired && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-md bg-slate-900 border border-white/10 rounded-2xl p-6 shadow-2xl text-center">
             <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚠️</span>

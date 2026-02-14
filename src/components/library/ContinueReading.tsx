@@ -30,7 +30,7 @@ export function ContinueReading({ book }: ContinueReadingProps) {
 
       <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
         {/* Book Cover */}
-        <div className="relative flex-shrink-0 w-32 md:w-48 aspect-[2/3] shadow-2xl rounded-lg overflow-hidden transform transition-transform group-hover:scale-105 duration-500">
+        <div className="relative shrink-0 w-32 md:w-48 aspect-2/3 shadow-2xl rounded-lg overflow-hidden transform transition-transform group-hover:scale-105 duration-500">
           <BookCover book={book} />
         </div>
 
@@ -55,14 +55,14 @@ export function ContinueReading({ book }: ContinueReadingProps) {
             </div>
             <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                className="h-full bg-linear-to-r from-indigo-500 to-purple-500 rounded-full"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
 
           <div className="pt-4">
-            <Link href={`/reader?url=${encodeURIComponent(bookUrl)}`}>
+            <Link href={`/reader/${book.id}`}>
               <Button
                 size="lg"
                 className="rounded-full bg-white text-slate-900 hover:bg-indigo-50 px-8 py-6 font-semibold text-lg shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95"

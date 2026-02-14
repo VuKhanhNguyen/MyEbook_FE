@@ -1,6 +1,7 @@
 "use client";
 
-import { Minus, Plus, Sun, Moon, Type } from "lucide-react";
+import { Minus, Plus, Sun, Moon, Type, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ReaderSettingsProps {
   fontSize: number;
@@ -15,9 +16,21 @@ export const ReaderSettings = ({
   theme,
   setTheme,
 }: ReaderSettingsProps) => {
+  const router = useRouter();
+
   return (
     <div className="absolute top-20 right-6 z-50 w-72 bg-neutral-900/95 backdrop-blur-xl border border-white/10 shadow-2xl rounded-xl p-5">
       <div className="space-y-4">
+        {/* Back to Library */}
+        <button
+          onClick={() => router.push("/library")}
+          className="w-full flex items-center justify-center gap-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 py-3 font-medium transition-colors mb-2 border border-indigo-500/20"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Library
+        </button>
+
+        <div className="h-px bg-white/10 my-4" />
+
         {/* Font Size Control */}
         <div>
           <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-300">

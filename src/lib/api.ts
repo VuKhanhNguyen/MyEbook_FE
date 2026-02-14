@@ -33,3 +33,11 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export const updateBookProgress = async (
+  bookId: string,
+  progress: number,
+  lastLocation: string,
+) => {
+  return api.post(`/books/${bookId}/progress`, { progress, lastLocation });
+};

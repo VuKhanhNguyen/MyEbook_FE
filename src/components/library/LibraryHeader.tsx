@@ -10,9 +10,11 @@ import {
   Plus,
   Search,
   Check,
+  Info,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AboutDialog } from "./AboutDialog";
 
 interface LibraryHeaderProps {
   searchQuery: string;
@@ -34,6 +36,7 @@ export function LibraryHeader({
   onUploadClick,
 }: LibraryHeaderProps) {
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -122,7 +125,7 @@ export function LibraryHeader({
             variant="ghost"
             size="icon"
             onClick={() => setViewMode("grid")}
-            className={`!h-8 !w-8 !p-0 rounded-md flex items-center justify-center ${
+            className={`h-8! w-8! p-0! rounded-md flex items-center justify-center ${
               viewMode === "grid"
                 ? "bg-white/10 text-white"
                 : "text-slate-400 hover:text-white"
@@ -134,7 +137,7 @@ export function LibraryHeader({
             variant="ghost"
             size="icon"
             onClick={() => setViewMode("list")}
-            className={`!h-8 !w-8 !p-0 rounded-md flex items-center justify-center ${
+            className={`h-8! w-8! p-0! rounded-md flex items-center justify-center ${
               viewMode === "list"
                 ? "bg-white/10 text-white"
                 : "text-slate-300 hover:text-white"
@@ -151,7 +154,22 @@ export function LibraryHeader({
           <Plus className="h-4 w-4 mr-2 text-black" />
           <span className="text-sm font-medium text-stone-950">Upload</span>
         </Button>
+
+        {/* About Trigger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          title="About"
+          onClick={() => setIsAboutOpen(true)}
+          className="h-10 w-10 border rounded-full text-slate-400 hover:text-white hover:bg-white/10 bg-amber-200"
+        >
+          <span className="text-sm font-medium text-stone-950">
+            <Info />
+          </span>
+        </Button>
       </div>
+
+      <AboutDialog open={isAboutOpen} onOpenChange={setIsAboutOpen} />
     </div>
   );
 }

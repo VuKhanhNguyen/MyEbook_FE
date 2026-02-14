@@ -132,7 +132,7 @@ export function BookCover({ book, className }: BookCoverProps) {
   // Fallback
   return (
     <div
-      className={`absolute inset-0 bg-gradient-to-br from-indigo-900 to-slate-900 flex items-center justify-center ${className}`}
+      className={`absolute inset-0 bg-linear-to-br from-indigo-900 to-slate-900 flex items-center justify-center ${className}`}
     >
       <div className="text-center p-4">
         <span className="text-4xl block mb-2 filter drop-shadow-lg">📖</span>
@@ -140,7 +140,7 @@ export function BookCover({ book, className }: BookCoverProps) {
           {book.format}
         </span>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-60"></div>
+      <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent opacity-60"></div>
     </div>
   );
 }

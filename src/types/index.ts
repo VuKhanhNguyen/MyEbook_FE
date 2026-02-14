@@ -5,7 +5,8 @@ export interface User {
 }
 
 export interface Book {
-  _id: string;
+  id: string; // Changed from _id due to backend transformation
+  _id?: string; // Optional for backward compatibility
   title: string;
   originalName: string;
   path: string;
@@ -18,6 +19,8 @@ export interface Book {
   coverUrl?: string; // Optional cover URL if we generate covers later
   lastRead?: string; // Timestamp of last read
   progress?: number; // % progress
+  lastLocation?: string; // Last read location (CFI or page number)
+  isFavorite?: boolean;
 }
 
 export type ViewMode = "grid" | "list";

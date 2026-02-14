@@ -28,7 +28,7 @@ export const BookPageContainer = ({
       <div className="absolute inset-0 bg-[#fffcf5] rounded-r-md shadow-[inset_20px_0_50px_rgba(0,0,0,0.1),20px_0_30px_rgba(0,0,0,0.3)] z-0" />
 
       {/* Spine Detail */}
-      <div className="absolute left-0 top-0 bottom-0 w-[40px] bg-gradient-to-r from-[#ddd] via-[#fff] to-[#eee] opacity-20 z-10 pointer-events-none mix-blend-multiply" />
+      <div className="absolute left-0 top-0 bottom-0 w-[40px] bg-linear-to-r from-[#ddd] via-white to-[#eee] opacity-20 z-10 pointer-events-none mix-blend-multiply" />
 
       {/* Content Layer */}
       <div className="absolute inset-0 z-20 px-4 md:px-12 py-8 overflow-hidden">

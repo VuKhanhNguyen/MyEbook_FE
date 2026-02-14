@@ -6,27 +6,76 @@ import { Menu, Settings } from "lucide-react";
 import { ReaderSidebar } from "./ReaderSidebar";
 import { ReaderSettings } from "./ReaderSettings";
 import { BookPageContainer } from "./BookPageContainer";
+import { updateBookProgress } from "@/lib/api";
+import { ProgressBar } from "./ProgressBar";
 
 interface EpubReaderProps {
   url: string;
+  initialLocation?: string | number;
+  initialProgress?: number;
+  bookId: string;
 }
 
-export const EpubReader = ({ url }: EpubReaderProps) => {
-  const [location, setLocation] = useState<string | number>(0);
+export const EpubReader = ({
+  url,
+  initialLocation,
+  initialProgress = 0,
+  bookId,
+}: EpubReaderProps) => {
+  const [location, setLocation] = useState<string | number>(
+    initialLocation || 0,
+  );
+  const [progress, setProgress] = useState<number>(initialProgress);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(100);
   const [theme, setTheme] = useState("dark");
   const tocRef = useRef<any>(null); // To store TOC data
 
+  // ... existing imports
+
   const onLocationChanged = (loc: string | number) => {
     setLocation(loc);
+    if (!renditionRef.current) return;
+    try {
+      // Get current location object from rendition
+      // Try both property access and method access (epub.js variation)
+      const currentLocation =
+        renditionRef.current.location?.start ||
+        renditionRef.current.currentLocation()?.start;
+
+      console.log("📍 Location Changed:", loc);
+      console.log("📍 Current Location Object:", currentLocation);
+
+      if (currentLocation && currentLocation.percentage !== undefined) {
+        const percentage = Math.round(currentLocation.percentage * 100);
+        console.log("✅ Calculated Percentage:", percentage);
+        setProgress(percentage);
+
+        if (bookId) {
+          // Debounce or just update - for now let's update directly (consider debouncing in production)
+          updateBookProgress(bookId, percentage, loc.toString())
+            .then(() => console.log("💾 Progress saved to API"))
+            .catch((err) => console.error("❌ Failed to save progress:", err));
+        } else {
+          console.warn("bookId is missing, cannot save progress");
+        }
+      } else {
+        console.log(
+          "⚠️ Percentage is undefined. Locations might not be generated yet.",
+        );
+      }
+    } catch (err) {
+      console.error("❌ Error calculating progress:", err);
+    }
   };
+
+  const renditionRef = useRef<any>(null);
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Top Bar (Floating) */}
-      <div className="absolute top-0 left-0 right-0 z-[60] flex h-16 items-center justify-between px-6 pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-60 flex h-16 items-center justify-between px-6 pointer-events-none">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className={`pointer-events-auto rounded-full p-2 transition-colors backdrop-blur-md ${
@@ -88,6 +137,7 @@ export const EpubReader = ({ url }: EpubReaderProps) => {
                 flow: "paginated",
                 width: "100%",
                 height: "100%",
+                allowScriptedContent: true,
               }}
               // Extract TOC
               getRendition={(rendition) => {
@@ -111,6 +161,29 @@ export const EpubReader = ({ url }: EpubReaderProps) => {
                   },
                 });
                 rendition.themes.select("custom");
+                renditionRef.current = rendition;
+
+                // Generate locations for accurate progress calculation
+                // 1000 chars per location is a good balance for performance
+                console.log("🔄 Starting location generation...");
+                rendition.book.locations
+                  .generate(1000)
+                  .then(() => {
+                    console.log("✅ Book locations generated successfully!");
+                    // Update progress immediately after generation if we have a location
+                    if (location) {
+                      const current = rendition.location?.start;
+                      console.log("📍 Location after generation:", current);
+                      if (current?.percentage !== undefined) {
+                        const p = Math.round(current.percentage * 100);
+                        console.log("✅ Initial progress update:", p);
+                        setProgress(p);
+                      }
+                    }
+                  })
+                  .catch((err) =>
+                    console.error("❌ Error generating locations:", err),
+                  );
               }}
               tocChanged={(toc) => {
                 tocRef.current = { toc };
@@ -147,6 +220,14 @@ export const EpubReader = ({ url }: EpubReaderProps) => {
               }}
             />
           </BookPageContainer>
+
+          {/* Progress Bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50 z-50">
+            <ProgressBar
+              progress={progress}
+              className="h-1 rounded-none bg-transparent"
+            />
+          </div>
         </div>
       </div>
     </div>

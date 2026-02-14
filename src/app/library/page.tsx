@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/auth-context";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Sidebar } from "@/components/library/Sidebar";
 import { ContinueReading } from "@/components/library/ContinueReading";
 import { LibraryHeader } from "@/components/library/LibraryHeader";
@@ -67,7 +67,7 @@ export default function LibraryPage() {
       const response = await api.delete(`/books/${id}`);
       if (response.status === 200 || response.status === 204) {
         toast.success("Book deleted successfully");
-        setBooks((prev) => prev.filter((b) => b._id !== id));
+        setBooks((prev) => prev.filter((b) => b.id !== id));
       } else {
         toast.error("Failed to delete book");
       }
@@ -106,10 +106,45 @@ export default function LibraryPage() {
     }
   };
 
+  const handleToggleFavorite = async (id: string) => {
+    try {
+      const response = await api.post(`/books/${id}/favorite`);
+      if (response.status === 200 || response.status === 201) {
+        setBooks((prev) =>
+          prev.map((book) =>
+            book.id === id ? { ...book, isFavorite: !book.isFavorite } : book,
+          ),
+        );
+        toast.success(
+          books.find((b) => b.id === id)?.isFavorite
+            ? "Removed from favorites"
+            : "Added to favorites",
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast.error("Failed to update favorite status");
+    }
+  };
+
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter");
+
   const filteredBooks = books
-    .filter((book) =>
-      book.title?.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
+    .filter((book) => {
+      const matchesSearch = book.title
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+
+      if (filter === "favorites") return book.isFavorite;
+      if (filter === "trash") return false; // Not implemented
+      if (filter === "collections") return false; // Not implemented
+      if (filter === "reading")
+        return (book.progress || 0) > 0 && (book.progress || 0) < 100;
+
+      return true;
+    })
     .sort((a, b) => {
       if (sortOption === "title") return a.title.localeCompare(b.title);
       if (sortOption === "author") return 0; // Author not implemented yet
@@ -137,9 +172,21 @@ export default function LibraryPage() {
 
       <div className="flex min-h-screen">
         {/* Sidebar - Sticky on desktop */}
-        <div className="hidden md:block w-64 flex-shrink-0 relative z-20 mx-6">
+        <div className="hidden md:block w-64 shrink-0 relative z-20 mx-6">
           <div className="sticky top-10 h-[calc(100vh-8rem)]">
-            <Sidebar className="h-full bg-slate-900/30 backdrop-blur-xl border border-white/5 rounded-3xl p-6 shadow-2xl" />
+            <Sidebar
+              className="h-full bg-slate-900/30 backdrop-blur-xl border border-white/5 rounded-3xl p-6 shadow-2xl"
+              counts={{
+                all: books.length,
+                recent: books.length,
+                favorites: books.filter((b) => b.isFavorite).length,
+                reading: books.filter(
+                  (b) => (b.progress || 0) > 0 && (b.progress || 0) < 100,
+                ).length,
+                trash: 0, // Placeholder
+                collections: 0, // Placeholder
+              }}
+            />
           </div>
         </div>
 
@@ -188,9 +235,10 @@ export default function LibraryPage() {
                 {!searchQuery && (
                   <Button
                     onClick={() => setIsOpen(true)}
-                    className="bg-indigo-600 text-white hover:bg-indigo-500 rounded-full"
+                    className="bg-indigo-600 text-zinc-900 hover:bg-indigo-500 rounded-full"
                   >
-                    <Upload className="mr-2 h-4 w-4" /> Upload Ebook
+                    <Upload className="mr-2 h-4 w-4 text-zinc-900" /> Upload
+                    Ebook
                   </Button>
                 )}
               </div>
@@ -203,10 +251,11 @@ export default function LibraryPage() {
                 }
               >
                 {filteredBooks.map((book) => (
-                  <div key={book._id}>
+                  <div key={book.id}>
                     <BookCard
                       book={book}
                       onDelete={(id) => handleDelete(id)}
+                      onToggleFavorite={handleToggleFavorite}
                       viewMode={viewMode}
                     />
                   </div>
